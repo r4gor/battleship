@@ -3,9 +3,8 @@
 class Lobby:
     def __init__(self, server, name):
         self.server = server
-        self.name = name
+        self.id = name
         self.players = []
-        self.boards = []
 
     def add_player(self, player):
         if len(self.players) < 2:
@@ -14,3 +13,5 @@ class Lobby:
     def remove_player(self, player):
         if player in self.players:
             self.players.remove(player)
+        if len(self.players) == 0:
+            self.server.removeLobby(self)

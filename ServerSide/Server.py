@@ -1,6 +1,7 @@
 import json
 import socket
 from ClientHandler import ClientHandler
+from ServerSide.Lobby import Lobby
 
 
 class Server:
@@ -12,18 +13,11 @@ class Server:
 
     def start(self):
         self.socket.listen(5)
+        print("Server started")
 
         while True:
-            print("Server started")
             clientSocket, address = self.socket.accept()
             print("Client connected" + str(address))
-
-            msg = {
-                "type": "notification",
-                "msg": "Welcome to the server! Please send your desired username",
-            }
-            clientSocket.send(json.dumps(msg).encode())
-            print("server sent: " + json.dumps(msg))
 
             clientHandler = ClientHandler(self, clientSocket, address)
             clientHandler.start()
@@ -38,7 +32,7 @@ class Server:
         handlers = []
         for handler in self.clientHandlers:
             handlers.append(handler)
-        return
+        return handlers
 
     def addLobby(self, lobby):
         self.lobbies.append(lobby)
@@ -46,7 +40,17 @@ class Server:
     def removeLobby(self, lobby):
         self.lobbies.remove(lobby)
 
+    def getOrCreateLobby(self, clientHandler, lobbyID):
+        for lobby in self.lobbies:
+            if lobby.id == lobbyID:
+                lobby.add_player(clientHandler)
+                return lobby
+        newLobby = Lobby(self, lobbyID)
+        newLobby.add_player(clientHandler)
+        self.addLobby(newLobby)
+        return newLobby
+
 
 if __name__ == "__main__":
-    server = Server(54321)
+    server = Server(5555)
     server.start()

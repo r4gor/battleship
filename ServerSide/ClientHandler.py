@@ -1,6 +1,6 @@
 import json
 import threading
-from EventsFromClientHandler import EventsFromClientHandler
+from HandleEventsFromClient import HandleEventsFromClient
 
 
 class ClientHandler(threading.Thread):
@@ -10,7 +10,7 @@ class ClientHandler(threading.Thread):
         self.clientSocket = clientSocket
         self.address = address
         self.running = True
-        self.Lobby = None
+        self.lobby = None
         self.username = ''
 
     def run(self):
@@ -20,7 +20,7 @@ class ClientHandler(threading.Thread):
             if not data:
                 break
 
-            EventsFromClientHandler(self, json.loads(data)).start()
+            HandleEventsFromClient(self, json.loads(data)).start()
 
     def getUsername(self):
         return self.username
@@ -28,12 +28,26 @@ class ClientHandler(threading.Thread):
     def setUsername(self, username):
         self.username = username
 
+    def setLobby(self, lobby):
+        self.lobby = lobby
+
+    def getLobby(self):
+        return self.lobby
+
     def getAllUsernames(self):
         usernames = []
         if self.server.getAllClientHandlers():
             for clientHandler in self.server.getAllClientHandlers():
                 usernames.append(clientHandler.getUsername())
         return usernames
+
+    def getAllNotAvailableLobbies(self):
+        notAvailableLobbies = []
+        for lobby in self.server.lobbies:
+            if len(lobby.players) == 2:
+                notAvailableLobbies.append(lobby.id)
+        return notAvailableLobbies
+
 
     def stop(self):
         self.running = False
