@@ -8,4 +8,5 @@ class SetupController:
         self.view = SetupView(self)
 
     def run(self):
+        # self.view.after(100, self.mainController.processEvents)
         self.view.deiconify()

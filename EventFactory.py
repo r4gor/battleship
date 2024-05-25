@@ -9,6 +9,9 @@ class WrongEvent(Exception):
 def EventFactory(eventType, **kwargs):
     event = None
     match eventType:
+        case 'serverConnectionLost':
+            event = generateServerConnectionLostEvent(eventType, kwargs)
+
         case 'notification':
             event = generateNotificationEvent(eventType, kwargs)
 
@@ -19,6 +22,13 @@ def EventFactory(eventType, **kwargs):
             raise WrongEvent(f'Wrong event type {eventType}')
 
     return json.dumps(event).encode()
+
+
+def generateServerConnectionLostEvent(eventType, kwargs):
+    event = {
+        "type": eventType
+    }
+    return event
 
 
 def generateNotificationEvent(eventType, kwargs):

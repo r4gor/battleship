@@ -1,13 +1,14 @@
 import json
+import socket
 import threading
-from HandleEventsFromClient import HandleEventsFromClient
+from .HandleEventsFromClient import HandleEventsFromClient
 
 
 class ClientHandler(threading.Thread):
     def __init__(self, server, clientSocket, address):
         threading.Thread.__init__(self)
         self.server = server
-        self.clientSocket = clientSocket
+        self.clientSocket: socket.socket = clientSocket
         self.address = address
         self.running = True
         self.lobby = None
@@ -18,6 +19,9 @@ class ClientHandler(threading.Thread):
 
             data = self.clientSocket.recv(1024).decode()
             if not data:
+                print('Client disconnected')
+                self.server.removeClientHandler(self)
+                self.stop()
                 break
 
             HandleEventsFromClient(self, json.loads(data)).start()

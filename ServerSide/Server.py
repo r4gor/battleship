@@ -1,6 +1,6 @@
 import json
 import socket
-from ClientHandler import ClientHandler
+from .ClientHandler import ClientHandler
 from ServerSide.Lobby import Lobby
 
 
@@ -49,6 +49,14 @@ class Server:
         newLobby.add_player(clientHandler)
         self.addLobby(newLobby)
         return newLobby
+
+    def removeClientHandler(self, clientHandler):
+        for lobby in self.lobbies:
+            if lobby.id == clientHandler.lobby.id:
+                #Lobby automatically gets removed if remains empty
+                lobby.remove_player(clientHandler)
+        self.clientHandlers.remove(clientHandler)
+
 
 
 if __name__ == "__main__":

@@ -13,7 +13,12 @@ class LoginController:
 
     def run(self):
         self.view.after(100, self.mainController.processEvents)
-        self.view.mainloop()
+        # self.view.protocol("WM_DELETE_WINDOW", self.mainController.on_close)
+        if self.mainController.mainLoopStarted:
+            self.view.deiconify()
+        else:
+            self.mainController.mainLoopStarted = True
+            self.view.mainloop()
 
     def connect(self):
         username = self.view.username_entry.get()
@@ -54,7 +59,6 @@ class LoginController:
             return "Waiting for server confirmation"
         except socket.error:
             return "Server unavailable"
-
 
     def showResponse(self, response):
         self.view.show_message(response)

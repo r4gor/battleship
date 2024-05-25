@@ -16,9 +16,9 @@ class LoginView(ctk.CTk):
 
     def create_widgets(self):
         self.logo = ctk.CTkImage(
-            dark_image=Image.open("../assets/logo.png"),
-            light_image=Image.open("../assets/logo.png"),
-            size=Image.open("../assets/logo.png").size
+            dark_image=Image.open("assets/logo.png"),
+            light_image=Image.open("assets/logo.png"),
+            size=Image.open("assets/logo.png").size
         )
 
         self.logo_label = ctk.CTkLabel(self, image=self.logo, text='')

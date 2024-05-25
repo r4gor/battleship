@@ -11,14 +11,14 @@ class HandleEventFromServer:
         if checkProperties == "OK":
             print(f"Received from server:  {self.event}")
             match self.event["type"].lower():
+                case "serverconnectionlost":
+                    self.handleServerConnectionLost()
+
                 case "notification":
                     self.handleNotificationEvent()
 
                 case "login":
                     self.handleLoginEvent()
-
-                case "error":
-                    self.handleErrorEvent()
 
                 case _:
                     response = {
@@ -35,7 +35,7 @@ class HandleEventFromServer:
             self.client.sendEvent(json.dumps(response).encode())
 
     def handleNotificationEvent(self):
-        self.client.getMainController().getCurrentController().showResponse()
+        self.client.getMainController().getCurrentController().showResponse(self.event["message"])
 
     def handleLoginEvent(self):
         if self.event["username"] != "" and self.event["lobby"] != "":
@@ -43,7 +43,7 @@ class HandleEventFromServer:
 
             self.client.getMainController().getCurrentController().showResponse("Logged in successfully")
 
-            #Change to setup
+            #Change to setup phase
             self.client.getMainController().show_setup()
         else:
             if self.event["username"] == "":
@@ -51,8 +51,8 @@ class HandleEventFromServer:
             else:
                 self.client.getMainController().getCurrentController().showResponse("Lobby not available")
 
-    def handleErrorEvent(self):
-        print("Received error event: " + json.dumps(self.event))
+    def handleServerConnectionLost(self):
+        self.client.getMainController().show_login()
 
 
 def hasProperties(event, *properties):
