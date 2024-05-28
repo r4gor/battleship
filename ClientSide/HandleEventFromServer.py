@@ -9,9 +9,8 @@ class HandleEventFromServer:
 
         checkProperties = hasProperties(self.event, "type")
         if checkProperties == "OK":
-            print(f"Received from server:  {self.event}")
-            match self.event["type"].lower():
-                case "serverconnectionlost":
+            match self.event["type"]:
+                case "serverConnectionLost":
                     self.handleServerConnectionLost()
 
                 case "notification":
@@ -20,11 +19,28 @@ class HandleEventFromServer:
                 case "login":
                     self.handleLoginEvent()
 
+                case "start":
+                    self.handleStartEvent()
+
+                case "turn":
+                    self.handleTurnEvent()
+
+                case "hit":
+                    self.handleHitEvent()
+
+                case "hitConfirm":
+                    self.handleHitConfirmEvent()
+
+                case "hitMiss":
+                    self.handleHitMissEvent()
+
                 case _:
                     response = {
                         "type": "error",
                         "message": "Unknown event type"
                     }
+                    print("Unknown event type")
+                    print(self.event)
                     self.client.sendEvent(json.dumps(response).encode())
 
         else:
@@ -40,6 +56,7 @@ class HandleEventFromServer:
     def handleLoginEvent(self):
         if self.event["username"] != "" and self.event["lobby"] != "":
             self.client.setUsername(self.event["username"])
+            self.client.setLobby(self.event["lobby"])
 
             self.client.getMainController().getCurrentController().showResponse("Logged in successfully")
 
@@ -53,6 +70,31 @@ class HandleEventFromServer:
 
     def handleServerConnectionLost(self):
         self.client.getMainController().show_login()
+
+    def handleStartEvent(self):
+        self.client.getMainController().show_game()
+
+    def handleTurnEvent(self):
+        if self.event["player"] == self.client.getUsername():
+            self.client.turn = True
+            self.client.getMainController().getCurrentController().showResponse("It's your turn")
+        else:
+            self.client.turn = False
+
+    def handleHitEvent(self):
+        self.client.getMainController().getCurrentController().hitMyBoard(self.event["x"],
+                                                                          self.event["y"])
+
+    def handleHitConfirmEvent(self):
+        self.client.getMainController().getCurrentController().hitOpponentBoard(self.event["x"],
+                                                                                self.event["y"],
+                                                                                self.event["sunk"],
+                                                                                self.event["allShipsSunk"])
+
+    def handleHitMissEvent(self):
+        self.client.getMainController().getCurrentController().missOpponentBoard(self.event["x"], self.event["y"])
+
+
 
 
 def hasProperties(event, *properties):

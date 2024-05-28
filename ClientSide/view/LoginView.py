@@ -1,24 +1,22 @@
 import customtkinter as ctk
 from PIL import Image
+import os
 
 
-class LoginView(ctk.CTk):
-    scheduledLabelId = None
+class LoginView(ctk.CTkFrame):
 
-    def __init__(self, controller):
-        super().__init__()
+    def __init__(self, parent, controller):
+        super().__init__(parent)
+        self.scheduledLabelId = None
         self.controller = controller
-        self.geometry(controller.mainController.geometry)
-        self.title(controller.mainController.title)
-        self.resizable(False, False)
         self.create_widgets()
-        self.deiconify()  # Ensure the new view is shown
 
     def create_widgets(self):
+        script_dir = os.path.dirname(__file__)
         self.logo = ctk.CTkImage(
-            dark_image=Image.open("assets/logo.png"),
-            light_image=Image.open("assets/logo.png"),
-            size=Image.open("assets/logo.png").size
+            dark_image=Image.open(script_dir + "../../../assets/logo.png"),
+            light_image=Image.open(script_dir + "../../../assets/logo.png"),
+            size=Image.open(script_dir + "../../../assets/logo.png").size
         )
 
         self.logo_label = ctk.CTkLabel(self, image=self.logo, text='')

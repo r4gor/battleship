@@ -1,10 +1,11 @@
 import queue
 import sys
-import threading
 
+from .GameController import GameController
 from .SetupController import SetupController
 from .LoginController import LoginController
 from ..HandleEventFromServer import HandleEventFromServer
+import customtkinter as ctk
 
 
 class Controller:
@@ -19,39 +20,62 @@ class Controller:
         self.SetupController = None
         self.GameController = None
 
+        self.main_window = ctk.CTk()
+        self.main_window.geometry(self.geometry)
+        self.main_window.title(self.title)
+        self.main_window.resizable(False, False)
+        self.main_window.protocol("WM_DELETE_WINDOW", self.on_close)
+
     def start(self):
         self.show_login()
+        if not self.mainLoopStarted:
+            self.mainLoopStarted = True
+            self.main_window.mainloop()
 
     def processEvents(self):
         while self.event_queue.qsize() > 0:
             event = self.event_queue.get(block=False)
             HandleEventFromServer(self.client, event)
         if self.current_controller:
-            self.current_controller.view.after(100, self.processEvents)
+            self.main_window.after(100, self.processEvents)
 
     def switch_controller(self, new_controller):
         if self.current_controller is not None:
-            print(f"Switching from {self.current_controller} to {new_controller}")
-            self.current_controller.view.withdraw()
-
-        self.current_controller = new_controller
+            self.current_controller.view.pack_forget()
+            self.current_controller.view.destroy()
+            del self.current_controller
+        self.current_controller = new_controller(self)
         self.current_controller.run()
 
     def addToQueue(self, data):
         self.event_queue.put(data)
 
     def show_login(self):
-        if self.LoginController is None:
-            self.LoginController = LoginController(self)
-        self.switch_controller(self.LoginController)
+        if self.client.getServerHandler() is not None:
+            self.client.getServerHandler().stop()
+        self.switch_controller(LoginController)
 
     def show_setup(self):
-        if self.SetupController is None:
-            self.SetupController = SetupController(self)
-        self.switch_controller(self.SetupController)
+        self.switch_controller(SetupController)
+
+    def show_game(self):
+        self.switch_controller(GameController)
+
+    def on_close(self):
+        self.quit()
+
+    def quit(self):
+        print('Quitting application...')
+        self.main_window.destroy()
+        self.main_window.quit()  # Stop the Tkinter main loop
+        if self.client.getServerHandler() is not None:
+            self.client.getServerHandler().stop()
+        self.mainLoopStarted = False
+        self.current_controller = None
+        del self.main_window
+        print('Cleanup done.')
+        sys.exit(0)  # Terminate the program
 
     def getCurrentController(self):
         return self.current_controller
 
-    # def show_game(self):
-    #     self.switch_controller(GameController)

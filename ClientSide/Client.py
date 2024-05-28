@@ -1,12 +1,16 @@
 from ClientSide.controllers.Controller import Controller
+from model.Board import Board
 
 
 class Client:
     def __init__(self):
         self.controller = None
         self.username = None
+        self.lobbyID = None
         self.serverHandler = None
         self.serverSocket = None
+        self.board = Board()
+        self.turn = False
 
     def start(self):
         print("Client started")
@@ -23,6 +27,12 @@ class Client:
 
     def getUsername(self):
         return self.username
+
+    def setLobby(self, lobbyID):
+        self.lobbyID = lobbyID
+
+    def getLobby(self):
+        return self.lobbyID
 
     def setServerHandler(self, handler):
         self.serverHandler = handler

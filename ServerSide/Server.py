@@ -57,6 +57,10 @@ class Server:
                 lobby.remove_player(clientHandler)
         self.clientHandlers.remove(clientHandler)
 
+    @staticmethod
+    def broadcastLobby(lobby, event):
+        for player in lobby.players:
+            player.clientSocket.send(event)
 
 
 if __name__ == "__main__":

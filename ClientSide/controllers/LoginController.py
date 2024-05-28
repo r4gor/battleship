@@ -9,16 +9,11 @@ class LoginController:
     def __init__(self, controller):
         self.mainController = controller
         self.client = controller.client
-        self.view = LoginView(self)
+        self.view = LoginView(controller.main_window, self)
 
     def run(self):
-        self.view.after(100, self.mainController.processEvents)
-        # self.view.protocol("WM_DELETE_WINDOW", self.mainController.on_close)
-        if self.mainController.mainLoopStarted:
-            self.view.deiconify()
-        else:
-            self.mainController.mainLoopStarted = True
-            self.view.mainloop()
+        self.view.pack(fill="both", expand=True)
+        self.mainController.processEvents()
 
     def connect(self):
         username = self.view.username_entry.get()
@@ -52,6 +47,7 @@ class LoginController:
             self.client.getServerSocket().connect((ip, port))
 
             self.client.setServerHandler(ServerHandler(self.client.getServerSocket(), self.client))
+            self.client.getServerHandler().daemon = True
             self.client.getServerHandler().start()
 
             self.checkUsernameAndLobby(username, lobby)

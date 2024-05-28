@@ -1,6 +1,8 @@
 import json
 import socket
 import threading
+
+from model.Board import Board
 from .HandleEventsFromClient import HandleEventsFromClient
 
 
@@ -13,6 +15,8 @@ class ClientHandler(threading.Thread):
         self.running = True
         self.lobby = None
         self.username = ''
+        self.board = Board()
+        self.ready = False
 
     def run(self):
         while self.running:
@@ -24,6 +28,7 @@ class ClientHandler(threading.Thread):
                 self.stop()
                 break
 
+            print(f"Received from client {self.getUsername()} {data}")
             HandleEventsFromClient(self, json.loads(data)).start()
 
     def getUsername(self):

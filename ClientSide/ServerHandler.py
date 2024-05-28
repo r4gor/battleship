@@ -1,6 +1,5 @@
 import json
 import threading
-import socket
 
 from EventFactory import EventFactory
 
@@ -24,13 +23,13 @@ class ServerHandler(threading.Thread):
                 while self.client.getMainController().event_queue.qsize() > 0:
                     pass
 
-                event = EventFactory("notification", message="Server closed the connection")
-                self.client.getMainController().addToQueue(json.loads(event))
+                event2 = EventFactory("notification", message="Server closed the connection")
+                self.client.getMainController().addToQueue(json.loads(event2))
                 break
 
+            print(f"Received from server:  {data}")
             self.client.getMainController().addToQueue(json.loads(data))
 
     def stop(self):
         self._stop_event.set()
         self.serverSocket.close()
-

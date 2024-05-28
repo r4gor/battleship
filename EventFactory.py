@@ -18,6 +18,24 @@ def EventFactory(eventType, **kwargs):
         case 'login':
             event = generateLoginEvent(eventType, kwargs)
 
+        case 'setup':
+            event = generateSetupEvent(eventType, kwargs)
+
+        case 'start':
+            event = generateStartEvent(eventType, kwargs)
+
+        case 'turn':
+            event = generateTurnEvent(eventType, kwargs)
+
+        case 'hit':
+            event = generateHitEvent(eventType, kwargs)
+
+        case 'hitConfirm':
+            event = generateHitConfirmEvent(eventType, kwargs)
+
+        case 'hitMiss':
+            event = generateHitMissEvent(eventType, kwargs)
+
         case _:
             raise WrongEvent(f'Wrong event type {eventType}')
 
@@ -52,3 +70,59 @@ def generateLoginEvent(eventType, kwargs):
         return event
     else:
         raise WrongEvent(f'Event missing required arguments {eventType} - {str(kwargs)} ')
+
+
+def generateSetupEvent(eventType, kwargs):
+    event = {
+        "type": eventType,
+        "Carrier": kwargs['Carrier'],
+        "Battleship": kwargs['Battleship'],
+        "Cruiser": kwargs['Cruiser'],
+        "Submarine": kwargs['Submarine'],
+        "Destroyer": kwargs['Destroyer']
+    }
+    return event
+
+
+def generateTurnEvent(eventType, kwargs):
+    event = {
+        "type": eventType,
+        "player": kwargs['player'],
+    }
+    return event
+
+
+def generateStartEvent(eventType, kwargs):
+    event = {
+        "type": eventType
+    }
+    return event
+
+
+def generateHitEvent(eventType, kwargs):
+    event = {
+        "type": eventType,
+        "x": kwargs['x'],
+        "y": kwargs['y']
+    }
+    return event
+
+
+def generateHitConfirmEvent(eventType, kwargs):
+    event = {
+        "type": eventType,
+        "x": kwargs['x'],
+        "y": kwargs['y'],
+        "sunk": kwargs['sunk'],
+        "allShipsSunk": kwargs["allShipsSunk"]
+    }
+    return event
+
+
+def generateHitMissEvent(eventType, kwargs):
+    event = {
+        "type": eventType,
+        "x": kwargs['x'],
+        "y": kwargs['y']
+    }
+    return event
