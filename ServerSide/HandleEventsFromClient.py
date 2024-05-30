@@ -24,6 +24,9 @@ class HandleEventsFromClient(threading.Thread):
                 case "hit":
                     self.handleHitEvent()
 
+                case "quit":
+                    self.handleQuitEvent()
+
                 case _:
                     response = {
                         "type": "error",
@@ -78,6 +81,8 @@ class HandleEventsFromClient(threading.Thread):
             event = EventFactory("start")
             self.clientHandler.server.broadcastLobby(self.clientHandler.lobby, event)
 
+            self.clientHandler.lobby.gameStarted = True
+
             time.sleep(0.3)
             # Send turn event
             self.sendTurn()
@@ -116,4 +121,17 @@ class HandleEventsFromClient(threading.Thread):
         time.sleep(0.2)
         if not status[2]:
             self.sendTurn()
+        # else:
+        #     self.gameEnded(self.clientHandler)
 
+    def handleQuitEvent(self):
+        # self.clientHandler.clientSocket.close()
+        if self.clientHandler in self.clientHandler.server.clientHandlers:
+            self.clientHandler.server.removeClientHandler(self.clientHandler)
+
+    @staticmethod
+    def gameEnded(clientHandler):
+        time.sleep(10)
+        for ch in clientHandler.lobby.players:
+            ch.server.removeClientHandler(ch)
+            ch.stop()

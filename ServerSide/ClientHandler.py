@@ -20,16 +20,28 @@ class ClientHandler(threading.Thread):
 
     def run(self):
         while self.running:
+            try:
+                data = self.clientSocket.recv(1024)
+                if not data:
+                    print('Client disconnected')
+                    if self in self.server.clientHandlers:
+                        self.server.removeClientHandler(self)
+                    if self.running:
+                        self.stop()
+                    break
 
-            data = self.clientSocket.recv(1024).decode()
-            if not data:
+                decoded_data = data.decode()
+                print(f"Received from client {self.getUsername()} {decoded_data}")
+                HandleEventsFromClient(self, json.loads(decoded_data)).start()
+
+            except OSError:
                 print('Client disconnected')
-                self.server.removeClientHandler(self)
-                self.stop()
+                self.clientSocket.close()
+                if self in self.server.clientHandlers:
+                    self.server.removeClientHandler(self)
+                if self.running:
+                    self.stop()
                 break
-
-            print(f"Received from client {self.getUsername()} {data}")
-            HandleEventsFromClient(self, json.loads(data)).start()
 
     def getUsername(self):
         return self.username
@@ -56,7 +68,6 @@ class ClientHandler(threading.Thread):
             if len(lobby.players) == 2:
                 notAvailableLobbies.append(lobby.id)
         return notAvailableLobbies
-
 
     def stop(self):
         self.running = False

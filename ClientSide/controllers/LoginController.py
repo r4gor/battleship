@@ -29,10 +29,16 @@ class LoginController:
             self.showResponse("Lobby must not be empty")
         elif len(lobby) > 4:
             self.showResponse("Lobby must be 4 characters max")
+        elif ' ' in username or ' ' in lobby or ' ' in ip or ' ' in port:
+            self.showResponse("Spaces are not allowed")
         elif not ip:
             self.showResponse("IP must not be empty")
         elif not port:
             self.showResponse("Port must not be empty")
+        elif not port.isnumeric():
+            self.showResponse("Port must be numeric")
+        elif int(port) > 65535 or int(port) < 1500:
+            self.showResponse("Port must be between 1500 and 65535")
         else:
             # self.view.show_message("Login successful")  # Placeholder for successful login action
             self.showResponse(self.connectToServer(ip, int(port), username, lobby))

@@ -34,6 +34,9 @@ class HandleEventFromServer:
                 case "hitMiss":
                     self.handleHitMissEvent()
 
+                case "opponentLeft":
+                    self.handleOpponentLeftEvent()
+
                 case _:
                     response = {
                         "type": "error",
@@ -94,7 +97,9 @@ class HandleEventFromServer:
     def handleHitMissEvent(self):
         self.client.getMainController().getCurrentController().missOpponentBoard(self.event["x"], self.event["y"])
 
-
+    def handleOpponentLeftEvent(self):
+        self.client.getMainController().getCurrentController().showResponse("Opponent left!\nRedirecting in 5 sec")
+        self.client.getMainController().main_window.after(5000, self.client.getMainController().restart)
 
 
 def hasProperties(event, *properties):

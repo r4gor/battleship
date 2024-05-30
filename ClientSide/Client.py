@@ -52,6 +52,13 @@ class Client:
     def getMainController(self):
         return self.controller
 
+    def reset(self):
+        self.username = None
+        self.lobbyID = None
+        self.serverHandler = None
+        self.serverSocket = None
+        self.board = Board()
+        self.turn = False
 
 if __name__ == "__main__":
     client = Client()

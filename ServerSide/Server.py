@@ -1,7 +1,24 @@
 import json
 import socket
+import threading
+import time
+
+from EventFactory import EventFactory
 from .ClientHandler import ClientHandler
 from ServerSide.Lobby import Lobby
+
+
+# Synchronizer
+def synchronized_with_attr(lock_name):
+    def decorator(method):
+        def synced_method(self, *args, **kws):
+            lock = getattr(self, lock_name)
+            with lock:
+                return method(self, *args, **kws)
+
+        return synced_method
+
+    return decorator
 
 
 class Server:
@@ -10,6 +27,7 @@ class Server:
         self.socket.bind(('', port))
         self.clientHandlers = []
         self.lobbies = []
+        self.lock = threading.RLock()
 
     def start(self):
         self.socket.listen(5)
@@ -20,6 +38,7 @@ class Server:
             print("Client connected" + str(address))
 
             clientHandler = ClientHandler(self, clientSocket, address)
+            clientHandler.daemon = True
             clientHandler.start()
 
             self.clientHandlers.append(clientHandler)
@@ -50,12 +69,25 @@ class Server:
         self.addLobby(newLobby)
         return newLobby
 
+    @synchronized_with_attr('lock')
     def removeClientHandler(self, clientHandler):
         for lobby in self.lobbies:
             if lobby.id == clientHandler.lobby.id:
                 #Lobby automatically gets removed if remains empty
                 lobby.remove_player(clientHandler)
-        self.clientHandlers.remove(clientHandler)
+
+                if lobby.gameStarted and len(lobby.players) > 0:
+                    notification = EventFactory("opponentLeft")
+                    lastPlayerInLobby = lobby.players[0]
+                    lastPlayerInLobby.clientSocket.send(notification)
+
+                    # lobby.remove_player(lastPlayerInLobby)
+                    # self.clientHandlers.remove(lastPlayerInLobby)
+                    # lastPlayerInLobby.stop()
+        if clientHandler in self.clientHandlers:
+            self.clientHandlers.remove(clientHandler)
+        if clientHandler.running:
+            clientHandler.stop()
 
     @staticmethod
     def broadcastLobby(lobby, event):

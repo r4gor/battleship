@@ -34,7 +34,7 @@ class GameController:
                     self.view.disable_all_buttons()
 
                     self.showResponse("You Lost!\n Redirecting to\n login in 10 sec", 10000)
-                    self.mainController.main_window.after(10000, self.mainController.show_login)
+                    self.mainController.main_window.after(10000, self.mainController.restart)
         else:
             self.view.myBoardButtons[(x, y)].configure(fg_color="grey")
 
@@ -46,7 +46,7 @@ class GameController:
                 self.view.disable_all_buttons()
 
                 self.showResponse("You WIN!\n Redirecting to\n login in 10 sec", 10000)
-                self.mainController.main_window.after(10000, self.mainController.show_login)
+                self.mainController.main_window.after(10000, self.mainController.restart)
 
     def missOpponentBoard(self, x, y):
         self.view.opponentBoardButtons[(x, y)].configure(fg_color="grey")

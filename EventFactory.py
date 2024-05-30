@@ -36,6 +36,13 @@ def EventFactory(eventType, **kwargs):
         case 'hitMiss':
             event = generateHitMissEvent(eventType, kwargs)
 
+        case 'quit':
+            event = generateQuitEvent(eventType, kwargs)
+
+        case 'opponentLeft':
+            event = generateOpponentLeftEvent(eventType, kwargs)
+
+
         case _:
             raise WrongEvent(f'Wrong event type {eventType}')
 
@@ -124,5 +131,17 @@ def generateHitMissEvent(eventType, kwargs):
         "type": eventType,
         "x": kwargs['x'],
         "y": kwargs['y']
+    }
+    return event
+
+def generateQuitEvent(eventType, kwargs):
+    event = {
+        "type": eventType,
+    }
+    return event
+
+def generateOpponentLeftEvent(eventType, kwargs):
+    event = {
+        "type": eventType
     }
     return event

@@ -5,6 +5,7 @@ class Lobby:
         self.server = server
         self.id = name
         self.players = []
+        self.gameStarted = False
 
     def add_player(self, player):
         if len(self.players) < 2:

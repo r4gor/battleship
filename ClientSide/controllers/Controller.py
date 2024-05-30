@@ -1,6 +1,8 @@
 import queue
 import sys
+import time
 
+from EventFactory import EventFactory
 from .GameController import GameController
 from .SetupController import SetupController
 from .LoginController import LoginController
@@ -53,6 +55,7 @@ class Controller:
     def show_login(self):
         if self.client.getServerHandler() is not None:
             self.client.getServerHandler().stop()
+        self.client.reset()
         self.switch_controller(LoginController)
 
     def show_setup(self):
@@ -76,6 +79,11 @@ class Controller:
         print('Cleanup done.')
         sys.exit(0)  # Terminate the program
 
+    def restart(self):
+        quitEvent = EventFactory("quit")
+        self.client.sendEvent(quitEvent)
+        self.show_login()
+        # self.client.reset()
+
     def getCurrentController(self):
         return self.current_controller
-
