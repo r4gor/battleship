@@ -27,6 +27,9 @@ class HandleEventsFromClient(threading.Thread):
                 case "quit":
                     self.handleQuitEvent()
 
+                case "message":
+                    self.handleMessageEvent()
+
                 case _:
                     response = {
                         "type": "error",
@@ -135,3 +138,6 @@ class HandleEventsFromClient(threading.Thread):
         for ch in clientHandler.lobby.players:
             ch.server.removeClientHandler(ch)
             ch.stop()
+
+    def handleMessageEvent(self):
+        self.clientHandler.server.broadcastLobby(self.clientHandler.lobby, json.dumps(self.event).encode())

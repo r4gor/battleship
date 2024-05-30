@@ -42,6 +42,8 @@ def EventFactory(eventType, **kwargs):
         case 'opponentLeft':
             event = generateOpponentLeftEvent(eventType, kwargs)
 
+        case 'message':
+            event = generateMessageEvent(eventType, kwargs)
 
         case _:
             raise WrongEvent(f'Wrong event type {eventType}')
@@ -143,5 +145,13 @@ def generateQuitEvent(eventType, kwargs):
 def generateOpponentLeftEvent(eventType, kwargs):
     event = {
         "type": eventType
+    }
+    return event
+
+def generateMessageEvent(eventType, kwargs):
+    event = {
+        "type": eventType,
+        "sender": kwargs['sender'],
+        "message": kwargs['message']
     }
     return event

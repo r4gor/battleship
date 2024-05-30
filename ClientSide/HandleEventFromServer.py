@@ -37,6 +37,9 @@ class HandleEventFromServer:
                 case "opponentLeft":
                     self.handleOpponentLeftEvent()
 
+                case "message":
+                    self.handleMessageEvent()
+
                 case _:
                     response = {
                         "type": "error",
@@ -100,6 +103,12 @@ class HandleEventFromServer:
     def handleOpponentLeftEvent(self):
         self.client.getMainController().getCurrentController().showResponse("Opponent left!\nRedirecting in 5 sec")
         self.client.getMainController().main_window.after(5000, self.client.getMainController().restart)
+
+    def handleMessageEvent(self):
+        sender = self.event["sender"]
+        msg = self.event["message"]
+        self.client.getMainController().getCurrentController().show_message(sender, msg)
+
 
 
 def hasProperties(event, *properties):

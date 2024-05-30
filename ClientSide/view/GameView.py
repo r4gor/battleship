@@ -1,4 +1,6 @@
 import string
+import textwrap
+
 import customtkinter as ctk
 
 
@@ -12,16 +14,30 @@ class GameView(ctk.CTkFrame):
 
     def create_widgets(self):
         self.myBoard_frame = ctk.CTkFrame(self)
-        self.myBoard_frame.place(relx=0.3, rely=0.5, anchor="center")
+        self.myBoard_frame.place(relx=0.4, rely=0.5, anchor="center")
         self.create_widgets_for_myBoardframe()
 
         self.opponentBoard_frame = ctk.CTkFrame(self)
-        self.opponentBoard_frame.place(relx=0.7, rely=0.5, anchor="center")
+        self.opponentBoard_frame.place(relx=0.8, rely=0.5, anchor="center")
         self.create_widgets_for_opponentBoard_frame()
 
         self.message_label = ctk.CTkLabel(self, text="", fg_color="Black", font=("Arial", 20))
-        self.message_label.place(relx=0.5, rely=0.8, anchor="center")
+        self.message_label.place(relx=0.6, rely=0.8, anchor="center")
         self.message_label.place_forget()
+
+        #Chat frame
+        self.chat_frame = ctk.CTkFrame(self)
+        self.chat_frame.place(relx=0.1, rely=0.7, anchor="center")
+        self.message_list_frame = ctk.CTkScrollableFrame(self.chat_frame)
+        self.message_list_frame.pack(expand=True, fill="both")
+
+        self.message_entry = ctk.CTkEntry(self.chat_frame)
+        self.message_entry.bind("<Return>", self.controller.send_message)
+        self.message_entry.pack(fill="x")
+        self.send_button = ctk.CTkButton(self.chat_frame, text="Send", command=self.controller.send_message)
+        self.send_button.pack()
+
+        self.message_list = []
 
     def create_widgets_for_myBoardframe(self):
         self.myBoardButtons = {}  # Dictionary to store button references
@@ -127,7 +143,7 @@ class GameView(ctk.CTkFrame):
             self.scheduledLabelId = None
 
         self.message_label.configure(text=message)
-        self.message_label.place(relx=0.5, rely=0.8, anchor="center")
+        self.message_label.place(relx=0.6, rely=0.8, anchor="center")
         self.scheduledLabelId = self.after(time, self.hide_message)
 
     def hide_message(self):
@@ -153,3 +169,16 @@ class GameView(ctk.CTkFrame):
         for button in self.opponentBoardButtons.values():
             button.configure(state="disabled")
 
+    def clearMessageEntry(self):
+        self.message_entry.delete(0, ctk.END)
+
+    def addMessage(self, sender, msg):
+        msg = textwrap.wrap(msg, width=190)
+        message_element = ctk.CTkTextbox(self.message_list_frame, width=200, height=24)
+        message_element.insert("0.0", f"<{sender}> {msg[0]}")
+        message_element.pack(pady=(0, 5), anchor="w")
+        self.message_list.append(message_element)
+
+        # Auto-scroll to the last message
+        self.message_list_frame.update_idletasks()
+        self.message_list_frame._parent_canvas.yview_moveto(1.0)

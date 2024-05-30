@@ -50,3 +50,15 @@ class GameController:
 
     def missOpponentBoard(self, x, y):
         self.view.opponentBoardButtons[(x, y)].configure(fg_color="grey")
+
+    def send_message(self, event=None):
+        msg = self.view.message_entry.get()
+        if msg != '':
+            self.view.clearMessageEntry()
+            msgEvent = EventFactory("message", sender=self.client.getUsername(), message=msg)
+            self.client.sendEvent(msgEvent)
+
+    def show_message(self, sender, msg):
+        self.view.addMessage(sender, msg)
+
+
