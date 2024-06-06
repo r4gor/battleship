@@ -7,12 +7,14 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /app
 
+RUN python3 -m venv venv
+
 COPY requirements.txt .
 
-RUN pip3 install --no-cache-dir -r requirements.txt
+RUN . venv/bin/activate && pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-CMD ["python3", "Main.py", "-s"]
+CMD ["venv/bin/python", "Main.py", "-s"]
 
 
