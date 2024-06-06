@@ -1,4 +1,4 @@
-FROM python:3.12-slim
+FROM ubuntu:24.04
 LABEL authors="Raul Agolli webraul.con"
 
 RUN apt-get update && apt-get install -y \
