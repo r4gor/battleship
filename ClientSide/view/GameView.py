@@ -173,9 +173,10 @@ class GameView(ctk.CTkFrame):
         self.message_entry.delete(0, ctk.END)
 
     def addMessage(self, sender, msg):
-        msg = textwrap.wrap(msg, width=190)
+        # msg = textwrap.wrap(msg, width=190)
         message_element = ctk.CTkTextbox(self.message_list_frame, width=200, height=24)
-        message_element.insert("0.0", f"<{sender}> {msg[0]}")
+        message_element.insert("0.0", f"<{sender}> {msg}")
+        message_element.configure(state="disabled")
         message_element.pack(pady=(0, 5), anchor="w")
         self.message_list.append(message_element)
 
