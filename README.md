@@ -1,5 +1,4 @@
-#Battleship
-Battleship game implemented in python
+# Battleship game implemented in python
 
 ## This repository contains:
 - all the files to run a docker container that hosts the server
